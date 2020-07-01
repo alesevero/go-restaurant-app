@@ -58,20 +58,24 @@ const Dashboard: React.FC = () => {
   }
 
   useEffect(() => {
-    let resource = '/foods';
-    if (selectedCategory) resource += `?category_like=${selectedCategory}`;
-    if (searchValue) resource += `?name_like=${searchValue}`;
-    api.get('/foods').then(response => {
-      const foodsFromApi = response.data;
-      const newFoods = foodsFromApi.map((food: Food) => {
-        const newFood = {
-          ...food,
-          formattedPrice: formatValue(food.price),
-        };
-        return newFood;
+    api
+      .get<Food[]>('/foods', {
+        params: {
+          category_like: selectedCategory,
+          name_like: searchValue,
+        },
+      })
+      .then(response => {
+        const foodsFromApi = response.data;
+        const newFoods = foodsFromApi.map((food: Food) => {
+          const newFood = {
+            ...food,
+            formattedPrice: formatValue(food.price),
+          };
+          return newFood;
+        });
+        setFoods(newFoods);
       });
-      setFoods(newFoods);
-    });
   }, [selectedCategory, searchValue]);
 
   useEffect(() => {
