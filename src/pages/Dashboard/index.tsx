@@ -61,7 +61,7 @@ const Dashboard: React.FC = () => {
     let resource = '/foods';
     if (selectedCategory) resource += `?category_like=${selectedCategory}`;
     if (searchValue) resource += `?name_like=${searchValue}`;
-    api.get(resource).then(response => {
+    api.get('/foods').then(response => {
       const foodsFromApi = response.data;
       const newFoods = foodsFromApi.map((food: Food) => {
         const newFood = {
