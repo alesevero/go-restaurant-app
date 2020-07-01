@@ -73,34 +73,61 @@ const FoodDetails: React.FC = () => {
 
   useEffect(() => {
     async function loadFood(): Promise<void> {
-      // Load a specific food with extras based on routeParams id
+      const response = await api.get(`/foods?id=${routeParams.id}`);
+      if (response) {
+        const foodFromApi: Food = response.data[0];
+        const newExtras = foodFromApi.extras.map(e => {
+          e.quantity = 0;
+          return e;
+        });
+        const newFood = {
+          ...foodFromApi,
+          formattedPrice: formatValue(foodFromApi.price),
+          extras: newExtras,
+        };
+        setFood(newFood);
+        setExtras(newFood.extras);
+      }
     }
 
     loadFood();
   }, [routeParams]);
 
   function handleIncrementExtra(id: number): void {
-    // Increment extra quantity
+    const extraIndex = extras.findIndex(e => e.id === id);
+    if (extraIndex >= 0) {
+      const newExtras = extras;
+      newExtras[extraIndex].quantity += 1;
+      setExtras([...newExtras]);
+    }
   }
 
   function handleDecrementExtra(id: number): void {
-    // Decrement extra quantity
+    const extraIndex = extras.findIndex(e => e.id === id);
+    if (extraIndex >= 0 && extras[extraIndex].quantity > 0) {
+      extras[extraIndex].quantity -= 1;
+      setExtras([...extras]);
+    }
   }
 
   function handleIncrementFood(): void {
-    // Increment food quantity
+    setFoodQuantity(foodQuantity + 1);
   }
 
   function handleDecrementFood(): void {
-    // Decrement food quantity
+    if (foodQuantity > 0) {
+      setFoodQuantity(foodQuantity - 1);
+    }
   }
 
   const toggleFavorite = useCallback(() => {
-    // Toggle if food is favorite or not
+    setIsFavorite(!isFavorite);
   }, [isFavorite, food]);
 
   const cartTotal = useMemo(() => {
-    // Calculate cartTotal
+    let total = food.price * foodQuantity;
+    total += extras.reduce((a, c) => a + c.quantity * c.value, 0);
+    return formatValue(total);
   }, [extras, food, foodQuantity]);
 
   async function handleFinishOrder(): Promise<void> {

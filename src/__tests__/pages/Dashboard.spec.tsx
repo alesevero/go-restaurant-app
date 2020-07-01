@@ -105,7 +105,6 @@ describe('Dashboard', () => {
       ),
     ).toBeTruthy();
   });
-
   it('should be able to list the food plates filtered by category', async () => {
     const items = [
       {
